@@ -4,6 +4,7 @@ import { useRuns } from '@/entities/run';
 import type { Run, RunStatus } from '@/entities/run';
 import { RunsStatusFilter } from './RunsStatusFilter';
 import type { RunsStatusFilterValue } from './RunsStatusFilter';
+import { RunsSearch } from './RunsSearch';
 import { runStatusLabels } from '../lib/runStatusLabels';
 
 const statusClasses: Record<RunStatus, string> = {
@@ -158,6 +159,7 @@ const RunsCards = ({ runs }: { runs: Run[] }) => {
 export const RunsList = () => {
   const [selectedStatus, setSelectedStatus] =
     useState<RunsStatusFilterValue>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const { data, isPending, isError, refetch } = useRuns();
 
   if (isPending) {
@@ -187,17 +189,28 @@ export const RunsList = () => {
     );
   }
 
-  const filteredRuns =
-    selectedStatus === 'all'
-      ? data
-      : data.filter((run) => run.status === selectedStatus);
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredRuns = data.filter(
+    (run) =>
+      (selectedStatus === 'all' || run.status === selectedStatus) &&
+      (run.name.toLowerCase().includes(normalizedQuery) ||
+        run.repository.toLowerCase().includes(normalizedQuery)),
+  );
 
   return (
     <>
-      <RunsStatusFilter value={selectedStatus} onChange={setSelectedStatus} />
+      <search
+        aria-label='Search and filter runs'
+        className='mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'
+      >
+        <RunsSearch value={searchQuery} onChange={setSearchQuery} />
+        <RunsStatusFilter value={selectedStatus} onChange={setSelectedStatus} />
+      </search>
       {filteredRuns.length === 0 ? (
         <div className='rounded-card border border-border/15 bg-white p-6 text-text-muted'>
-          {data.length === 0 ? 'No runs yet.' : 'No runs with this status.'}
+          {data.length === 0
+            ? 'No runs yet.'
+            : 'No runs match your search or status filter.'}
         </div>
       ) : (
         <>

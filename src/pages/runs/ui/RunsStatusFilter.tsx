@@ -24,7 +24,7 @@ export const RunsStatusFilter = ({
     <div
       role='group'
       aria-label='Filter runs by status'
-      className='mb-5 flex flex-wrap gap-2'
+      className='flex flex-wrap gap-2'
     >
       {filters.map((filter) => {
         const isSelected = value === filter;
@@ -35,7 +35,7 @@ export const RunsStatusFilter = ({
             type='button'
             aria-pressed={isSelected}
             onClick={() => onChange(filter)}
-            className={`min-h-10 rounded-full border px-4 py-2 text-sm font-semibold transition-colors outline-offset-2 focus-visible:outline-2 focus-visible:outline-ink ${
+            className={`min-h-10 cursor-pointer rounded-full border px-4 py-2 text-sm font-semibold transition-colors outline-offset-2 focus-visible:outline-2 focus-visible:outline-ink ${
               isSelected
                 ? 'border-ink bg-ink text-white'
                 : 'border-border/20 bg-white text-ink hover:border-ink/50 hover:bg-canvas'
