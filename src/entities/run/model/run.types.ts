@@ -1,13 +1,5 @@
-export type RunStatus = 'queued' | 'running' | 'succeeded' | 'failed';
+import type { z } from 'zod';
+import { runSchema } from './run.schemas';
 
-export type Run = {
-  id: string;
-  name: string;
-  repository: string;
-  branch: string;
-  status: RunStatus;
-  createdAt: string;
-  durationSeconds?: number;
-  logs: string[];
-  result?: string;
-};
+export type Run = z.infer<typeof runSchema>;
+export type RunStatus = Run['status'];

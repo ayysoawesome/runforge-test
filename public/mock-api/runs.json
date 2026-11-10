@@ -1,0 +1,82 @@
+[
+  {
+    "id": "run-001",
+    "name": "Auth refactor",
+    "repository": "web-platform",
+    "branch": "feature/auth-refactor",
+    "status": "running",
+    "createdAt": "2026-11-10T08:42:00Z",
+    "logs": [
+      "Preparing isolated runtime",
+      "Checking out feature/auth-refactor",
+      "Running authentication tests"
+    ]
+  },
+  {
+    "id": "run-002",
+    "name": "Fix checkout tests",
+    "repository": "payments",
+    "branch": "fix/checkout-tests",
+    "status": "succeeded",
+    "createdAt": "2026-11-10T07:18:00Z",
+    "durationSeconds": 184,
+    "logs": [
+      "Preparing isolated runtime",
+      "Running checkout test suite",
+      "All 42 tests passed"
+    ],
+    "result": "All checkout tests pass."
+  },
+  {
+    "id": "run-003",
+    "name": "Update dependencies",
+    "repository": "api-service",
+    "branch": "chore/update-dependencies",
+    "status": "queued",
+    "createdAt": "2026-11-10T09:05:00Z",
+    "logs": ["Run created", "Waiting for an available runtime"]
+  },
+  {
+    "id": "run-004",
+    "name": "Investigate build failure",
+    "repository": "web-platform",
+    "branch": "fix/build-pipeline",
+    "status": "failed",
+    "createdAt": "2026-11-09T16:31:00Z",
+    "durationSeconds": 96,
+    "logs": [
+      "Preparing isolated runtime",
+      "Running production build",
+      "Build failed: unresolved import in dashboard module"
+    ],
+    "result": "The dashboard imports a missing module."
+  },
+  {
+    "id": "run-005",
+    "name": "Add billing summary",
+    "repository": "payments",
+    "branch": "feature/billing-summary",
+    "status": "succeeded",
+    "createdAt": "2026-11-09T13:12:00Z",
+    "durationSeconds": 328,
+    "logs": [
+      "Preparing isolated runtime",
+      "Generating billing summary component",
+      "Build and tests passed"
+    ],
+    "result": "Billing summary component is ready for review."
+  },
+  {
+    "id": "run-006",
+    "name": "Review API error handling",
+    "repository": "api-service",
+    "branch": "feature/error-handling",
+    "status": "running",
+    "createdAt": "2026-11-09T11:47:00Z",
+    "logs": [
+      "Preparing isolated runtime",
+      "Inspecting API error responses",
+      "Updating error mapping"
+    ]
+  }
+]

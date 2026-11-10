@@ -69,4 +69,4 @@ class BaseService {
   }
 }
 
-export const baseService = new BaseService('/mocks');
+export const baseService = new BaseService('/mock-api');
