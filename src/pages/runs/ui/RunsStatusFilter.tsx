@@ -24,7 +24,7 @@ export const RunsStatusFilter = ({
     <div
       role='group'
       aria-label='Filter runs by status'
-      className='flex flex-wrap gap-2'
+      className='flex gap-2 overflow-x-scroll scrollbar-none'
     >
       {filters.map((filter) => {
         const isSelected = value === filter;

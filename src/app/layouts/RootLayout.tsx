@@ -8,7 +8,7 @@ export const RootLayout: FC<PropsWithChildren<IRootLayoutProps>> = ({
   children,
 }) => {
   return (
-    <div className='flex min-h-dvh flex-col bg-canvas font-sans text-ink md:flex-row'>
+    <div className='flex min-h-dvh flex-col bg-canvas font-sans text-ink md:flex-row overflow-x-hidden'>
       <Menu />
       <div className='min-w-0 flex-1'>
         <header className='flex min-h-16 items-center justify-between gap-3 border-b border-border/20 px-5 md:px-8'>
