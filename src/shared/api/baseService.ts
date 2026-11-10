@@ -7,9 +7,9 @@ type THttpMethod =
 
 type TQueryParams = Record<string, unknown>;
 
-export abstract class BaseService {
-  protected readonly apiClient: $Fetch;
-  protected readonly baseEndpoint: string;
+class BaseService {
+  private readonly apiClient: $Fetch;
+  private readonly baseEndpoint: string;
 
   constructor(baseEndpoint: string) {
     this.apiClient = apiClient;
@@ -68,3 +68,5 @@ export abstract class BaseService {
     return this.#request({ method: 'DELETE', queryParams }, endpoint);
   }
 }
+
+export const baseService = new BaseService('/mocks');

@@ -9,4 +9,4 @@ const createApiClientInstance = (baseURL: string) => {
   });
 };
 
-export const apiClient = createApiClientInstance('temp');
+export const apiClient = createApiClientInstance('');
