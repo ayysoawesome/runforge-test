@@ -1,32 +1,45 @@
-# React + TypeScript + Vite
+# Runforge — Runs
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Страница для просмотра запусков AI-агентов. Показывает список, поиск по названию и репозиторию, фильтр по статусу, сортировку и подробности запуска с логами и результатом. Данные загружаются из локального mock-файла с небольшой задержкой.
 
-Currently, two official plugins are available:
+## Установка и запуск
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Нужны Node.js и pnpm. Проект проверен с Node.js 24 и pnpm 11.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Откройте адрес, который выведет Vite в терминале. Для проверки production-сборки:
+
+```bash
+pnpm build
+pnpm preview
+```
+
+## Проверка
+
+```bash
+pnpm build
+pnpm lint
+pnpm test
+```
+
+Три автотеста проверяют фильтрацию по статусу, поиск по названию и репозиторию вместе с фильтром, а также открытие деталей с логами и результатом. Остальные состояния можно проверить вручную:
+
+1. Дождитесь окончания загрузки и убедитесь, что показаны шесть запусков со статусами Queued, Running, Succeeded и Failed.
+2. Выберите статус и введите часть названия или репозитория. Список должен учитывать оба условия одновременно.
+3. Введите строку без совпадений. Должно появиться сообщение и кнопка **Clear search and filters**, которая возвращает полный список.
+4. Откройте запуск по названию или карточке. Проверьте данные, логи и результат у завершённого запуска; закройте окно кнопкой или клавишей Escape.
+5. В инструментах разработчика заблокируйте запрос `/mock-api/runs.json` и обновите страницу. После сообщения об ошибке разблокируйте запрос и нажмите **Retry**.
+6. Проверьте страницу при ширине окна 360 px: список представлен карточками, фильтры прокручиваются по горизонтали.
+
+## Структура
+
+- `src/app` — инициализация и основной layout.
+- `src/pages/runs` — страница, список, поиск, фильтры и окно деталей.
+- `src/entities/run` — типы, проверка данных и запросы запусков.
+- `src/shared` — общий API-клиент и UI.
+- `src/widgets/menu` — навигация.
+- `public/mock-api/runs.json` — локальные данные для шести запусков.
