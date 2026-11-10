@@ -5,6 +5,8 @@ import type { Run } from '@/entities/run';
 import { RunsStatusFilter } from './RunsStatusFilter';
 import type { RunsStatusFilterValue } from './RunsStatusFilter';
 import { RunsSearch } from './RunsSearch';
+import { RunsSort } from './RunsSort';
+import type { RunsSortBy, RunsSortDirection } from './RunsSort';
 import { RunDetailsModal } from './RunDetailsModal';
 import { StatusBadge } from './StatusBadge';
 import { formatCreatedAt, formatDuration } from '../lib/formatRun';
@@ -128,6 +130,8 @@ export const RunsList = () => {
   const [selectedStatus, setSelectedStatus] =
     useState<RunsStatusFilterValue>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<RunsSortBy>('createdAt');
+  const [sortDirection, setSortDirection] = useState<RunsSortDirection>('desc');
   const [selectedRun, setSelectedRun] = useState<Run | null>(null);
   const { data, isPending, isError, refetch } = useRuns();
 
@@ -165,6 +169,18 @@ export const RunsList = () => {
       (run.name.toLowerCase().includes(normalizedQuery) ||
         run.repository.toLowerCase().includes(normalizedQuery)),
   );
+  const sortedRuns = [...filteredRuns].sort((first, second) => {
+    const firstValue = sortBy === 'createdAt' ? Date.parse(first.createdAt) : first.durationSeconds;
+    const secondValue = sortBy === 'createdAt' ? Date.parse(second.createdAt) : second.durationSeconds;
+    const firstMissing = firstValue === undefined || Number.isNaN(firstValue);
+    const secondMissing = secondValue === undefined || Number.isNaN(secondValue);
+
+    if (firstMissing || secondMissing) {
+      return Number(firstMissing) - Number(secondMissing);
+    }
+
+    return sortDirection === 'desc' ? secondValue - firstValue : firstValue - secondValue;
+  });
 
   return (
     <>
@@ -175,6 +191,12 @@ export const RunsList = () => {
         <RunsSearch value={searchQuery} onChange={setSearchQuery} />
         <RunsStatusFilter value={selectedStatus} onChange={setSelectedStatus} />
       </search>
+      <RunsSort
+        sortBy={sortBy}
+        sortDirection={sortDirection}
+        onSortByChange={setSortBy}
+        onSortDirectionChange={setSortDirection}
+      />
       {filteredRuns.length === 0 ? (
         <div className='rounded-card border border-border/15 bg-white p-6 text-text-muted'>
           {data.length === 0
@@ -183,8 +205,8 @@ export const RunsList = () => {
         </div>
       ) : (
         <>
-          <RunsTable runs={filteredRuns} onSelectRun={setSelectedRun} />
-          <RunsCards runs={filteredRuns} onSelectRun={setSelectedRun} />
+          <RunsTable runs={sortedRuns} onSelectRun={setSelectedRun} />
+          <RunsCards runs={sortedRuns} onSelectRun={setSelectedRun} />
         </>
       )}
       <RunDetailsModal run={selectedRun} onClose={() => setSelectedRun(null)} />
