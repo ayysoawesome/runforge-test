@@ -1,12 +1,10 @@
+import { useState } from 'react';
+
 import { useRuns } from '@/entities/run';
 import type { Run, RunStatus } from '@/entities/run';
-
-const statusLabels: Record<RunStatus, string> = {
-  queued: 'Queued',
-  running: 'Running',
-  succeeded: 'Succeeded',
-  failed: 'Failed',
-};
+import { RunsStatusFilter } from './RunsStatusFilter';
+import type { RunsStatusFilterValue } from './RunsStatusFilter';
+import { runStatusLabels } from '../lib/runStatusLabels';
 
 const statusClasses: Record<RunStatus, string> = {
   queued: 'bg-warning-soft',
@@ -52,7 +50,7 @@ const StatusBadge = ({ status }: { status: RunStatus }) => {
         aria-hidden='true'
         className={`size-2 rounded-full ${statusDotClasses[status]}`}
       />
-      {statusLabels[status]}
+      {runStatusLabels[status]}
     </span>
   );
 };
@@ -69,12 +67,24 @@ const RunsTable = ({ runs }: { runs: Run[] }) => {
         <caption className='sr-only'>Recent runs</caption>
         <thead className='border-b border-border/15 bg-canvas text-xs uppercase tracking-wide text-text-muted'>
           <tr>
-            <th scope='col' className='px-5 py-4 font-semibold'>Name</th>
-            <th scope='col' className='px-5 py-4 font-semibold'>Repository</th>
-            <th scope='col' className='px-5 py-4 font-semibold'>Branch</th>
-            <th scope='col' className='px-5 py-4 font-semibold'>Status</th>
-            <th scope='col' className='px-5 py-4 font-semibold'>Created</th>
-            <th scope='col' className='px-5 py-4 font-semibold'>Duration</th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Name
+            </th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Repository
+            </th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Branch
+            </th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Status
+            </th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Created
+            </th>
+            <th scope='col' className='px-5 py-4 font-semibold'>
+              Duration
+            </th>
           </tr>
         </thead>
         <tbody className='divide-y divide-border/10'>
@@ -87,9 +97,13 @@ const RunsTable = ({ runs }: { runs: Run[] }) => {
               <td className='px-5 py-5 font-mono text-xs break-all text-text-muted'>
                 {run.branch}
               </td>
-              <td className='px-5 py-5'><StatusBadge status={run.status} /></td>
+              <td className='px-5 py-5'>
+                <StatusBadge status={run.status} />
+              </td>
               <td className='whitespace-nowrap px-5 py-5 text-text-muted'>
-                <time dateTime={run.createdAt}>{formatCreatedAt(run.createdAt)}</time>
+                <time dateTime={run.createdAt}>
+                  {formatCreatedAt(run.createdAt)}
+                </time>
               </td>
               <td className='whitespace-nowrap px-5 py-5 text-text-muted'>
                 {formatDuration(run.durationSeconds)}
@@ -116,15 +130,23 @@ const RunsCards = ({ runs }: { runs: Run[] }) => {
             </header>
             <dl className='grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm'>
               <dt className='text-text-muted'>Repository</dt>
-              <dd className='min-w-0 break-words text-right'>{run.repository}</dd>
+              <dd className='min-w-0 break-words text-right'>
+                {run.repository}
+              </dd>
               <dt className='text-text-muted'>Branch</dt>
-              <dd className='min-w-0 font-mono text-xs break-all text-right'>{run.branch}</dd>
+              <dd className='min-w-0 font-mono text-xs break-all text-right'>
+                {run.branch}
+              </dd>
               <dt className='text-text-muted'>Created</dt>
               <dd className='min-w-0 text-right'>
-                <time dateTime={run.createdAt}>{formatCreatedAt(run.createdAt)}</time>
+                <time dateTime={run.createdAt}>
+                  {formatCreatedAt(run.createdAt)}
+                </time>
               </dd>
               <dt className='text-text-muted'>Duration</dt>
-              <dd className='min-w-0 text-right'>{formatDuration(run.durationSeconds)}</dd>
+              <dd className='min-w-0 text-right'>
+                {formatDuration(run.durationSeconds)}
+              </dd>
             </dl>
           </article>
         </li>
@@ -134,6 +156,8 @@ const RunsCards = ({ runs }: { runs: Run[] }) => {
 };
 
 export const RunsList = () => {
+  const [selectedStatus, setSelectedStatus] =
+    useState<RunsStatusFilterValue>('all');
   const { data, isPending, isError, refetch } = useRuns();
 
   if (isPending) {
@@ -163,18 +187,24 @@ export const RunsList = () => {
     );
   }
 
-  if (data.length === 0) {
-    return (
-      <div className='rounded-card border border-border/15 bg-white p-6 text-text-muted'>
-        No runs yet.
-      </div>
-    );
-  }
+  const filteredRuns =
+    selectedStatus === 'all'
+      ? data
+      : data.filter((run) => run.status === selectedStatus);
 
   return (
     <>
-      <RunsTable runs={data} />
-      <RunsCards runs={data} />
+      <RunsStatusFilter value={selectedStatus} onChange={setSelectedStatus} />
+      {filteredRuns.length === 0 ? (
+        <div className='rounded-card border border-border/15 bg-white p-6 text-text-muted'>
+          {data.length === 0 ? 'No runs yet.' : 'No runs with this status.'}
+        </div>
+      ) : (
+        <>
+          <RunsTable runs={filteredRuns} />
+          <RunsCards runs={filteredRuns} />
+        </>
+      )}
     </>
   );
 };
