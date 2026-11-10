@@ -1,3 +1,27 @@
 @theme {
     --color-*: initial;
+
+    --color-canvas: #fdfaf6;
+    --color-ink: #081a33;
+    --color-white: #fff;
+    --color-text-muted: #555;
+    --color-text-inverse-muted: #999;
+    --color-border: #081a33;
+    --color-border-inverse: #ffffff1a;
+
+    --color-accent: #3b82f6;
+    --color-accent-soft: #3b82f614;
+    --color-success: #34d399;
+    --color-success-soft: #34d39914;
+    --color-warning: #fbbf24;
+    --color-warning-soft: #fbbf240f;
+    --color-danger: #f87171;
+    --color-danger-soft: #f871710f;
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --radius-control: 12px;
+    --radius-card: 16px;
+    --radius-panel: 20px;
 }
