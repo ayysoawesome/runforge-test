@@ -1,62 +1,15 @@
 import { useState } from 'react';
 
 import { useRuns } from '@/entities/run';
-import type { Run, RunStatus } from '@/entities/run';
+import type { Run } from '@/entities/run';
 import { RunsStatusFilter } from './RunsStatusFilter';
 import type { RunsStatusFilterValue } from './RunsStatusFilter';
 import { RunsSearch } from './RunsSearch';
-import { runStatusLabels } from '../lib/runStatusLabels';
+import { RunDetailsModal } from './RunDetailsModal';
+import { StatusBadge } from './StatusBadge';
+import { formatCreatedAt, formatDuration } from '../lib/formatRun';
 
-const statusClasses: Record<RunStatus, string> = {
-  queued: 'bg-warning-soft',
-  running: 'bg-accent-soft',
-  succeeded: 'bg-success-soft',
-  failed: 'bg-danger-soft',
-};
-
-const statusDotClasses: Record<RunStatus, string> = {
-  queued: 'bg-warning',
-  running: 'bg-accent',
-  succeeded: 'bg-success',
-  failed: 'bg-danger',
-};
-
-const dateFormatter = new Intl.DateTimeFormat('en-GB', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-});
-
-const formatCreatedAt = (value: string): string => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '—' : dateFormatter.format(date);
-};
-
-const formatDuration = (seconds?: number): string => {
-  if (seconds === undefined) return '—';
-
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return minutes ? `${minutes}m ${remainingSeconds}s` : `${remainingSeconds}s`;
-};
-
-const StatusBadge = ({ status }: { status: RunStatus }) => {
-  return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink ${statusClasses[status]}`}
-    >
-      <span
-        aria-hidden='true'
-        className={`size-2 rounded-full ${statusDotClasses[status]}`}
-      />
-      {runStatusLabels[status]}
-    </span>
-  );
-};
-
-const RunsTable = ({ runs }: { runs: Run[] }) => {
+const RunsTable = ({ runs, onSelectRun }: { runs: Run[]; onSelectRun: (run: Run) => void }) => {
   return (
     <div
       role='region'
@@ -90,9 +43,15 @@ const RunsTable = ({ runs }: { runs: Run[] }) => {
         </thead>
         <tbody className='divide-y divide-border/10'>
           {runs.map((run) => (
-            <tr key={run.id}>
+            <tr key={run.id} onClick={() => onSelectRun(run)} className='cursor-pointer hover:bg-canvas/70'>
               <th scope='row' className='px-5 py-5 font-semibold text-ink'>
-                {run.name}
+                <button
+                  type='button'
+                  aria-haspopup='dialog'
+                  className='rounded-sm text-left outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ink'
+                >
+                  {run.name}
+                </button>
               </th>
               <td className='px-5 py-5'>{run.repository}</td>
               <td className='px-5 py-5 font-mono text-xs break-all text-text-muted'>
@@ -117,15 +76,24 @@ const RunsTable = ({ runs }: { runs: Run[] }) => {
   );
 };
 
-const RunsCards = ({ runs }: { runs: Run[] }) => {
+const RunsCards = ({ runs, onSelectRun }: { runs: Run[]; onSelectRun: (run: Run) => void }) => {
   return (
     <ul className='grid gap-3 sm:grid-cols-2 md:hidden'>
       {runs.map((run) => (
         <li key={run.id} className='min-w-0'>
-          <article className='h-full min-w-0 rounded-card border border-border/15 bg-white p-5'>
+          <article
+            onClick={() => onSelectRun(run)}
+            className='h-full min-w-0 cursor-pointer rounded-card border border-border/15 bg-white p-5 hover:bg-canvas/70'
+          >
             <header className='mb-4 flex flex-wrap items-start justify-between gap-3'>
               <h2 className='min-w-0 text-base font-semibold break-words text-ink'>
-                {run.name}
+                <button
+                  type='button'
+                  aria-haspopup='dialog'
+                  className='rounded-sm text-left outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ink'
+                >
+                  {run.name}
+                </button>
               </h2>
               <StatusBadge status={run.status} />
             </header>
@@ -160,6 +128,7 @@ export const RunsList = () => {
   const [selectedStatus, setSelectedStatus] =
     useState<RunsStatusFilterValue>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRun, setSelectedRun] = useState<Run | null>(null);
   const { data, isPending, isError, refetch } = useRuns();
 
   if (isPending) {
@@ -214,10 +183,11 @@ export const RunsList = () => {
         </div>
       ) : (
         <>
-          <RunsTable runs={filteredRuns} />
-          <RunsCards runs={filteredRuns} />
+          <RunsTable runs={filteredRuns} onSelectRun={setSelectedRun} />
+          <RunsCards runs={filteredRuns} onSelectRun={setSelectedRun} />
         </>
       )}
+      <RunDetailsModal run={selectedRun} onClose={() => setSelectedRun(null)} />
     </>
   );
 };
