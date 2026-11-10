@@ -199,9 +199,23 @@ export const RunsList = () => {
       />
       {filteredRuns.length === 0 ? (
         <div className='rounded-card border border-border/15 bg-white p-6 text-text-muted'>
-          {data.length === 0
-            ? 'No runs yet.'
-            : 'No runs match your search or status filter.'}
+          <p>
+            {data.length === 0
+              ? 'No runs yet.'
+              : 'No runs match your search or status filter.'}
+          </p>
+          {data.length > 0 && (
+            <button
+              type='button'
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedStatus('all');
+              }}
+              className='mt-4 min-h-11 rounded-control bg-ink px-4 py-2 text-sm font-semibold text-white outline-offset-2 focus-visible:outline-2 focus-visible:outline-ink'
+            >
+              Clear search and filters
+            </button>
+          )}
         </div>
       ) : (
         <>
