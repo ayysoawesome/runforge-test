@@ -5,19 +5,47 @@ import { MenuNavigation } from './MenuNavigation';
 const desktopMediaQuery = '(min-width: 48rem)';
 
 export const MobileMenu = () => {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDialogElement>(null);
+  const previousOverflow = useRef<string | null>(null);
 
   useEffect(() => {
     const desktop = window.matchMedia(desktopMediaQuery);
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const restoreScroll = () => {
+      if (menu.open || previousOverflow.current === null) return;
+      document.body.style.overflow = previousOverflow.current;
+      previousOverflow.current = null;
+    };
     const closeOnDesktop = () => {
-      if (desktop.matches && menuRef.current?.matches(':popover-open')) {
-        menuRef.current.hidePopover();
+      if (desktop.matches && menu.open) {
+        menu.close();
       }
     };
 
+    menu.addEventListener('close', restoreScroll);
     desktop.addEventListener('change', closeOnDesktop);
-    return () => desktop.removeEventListener('change', closeOnDesktop);
+    return () => {
+      desktop.removeEventListener('change', closeOnDesktop);
+      menu.removeEventListener('close', restoreScroll);
+      if (menu.open) {
+        menu.close();
+        restoreScroll();
+      }
+    };
   }, []);
+
+  const openMenu = () => {
+    const menu = menuRef.current;
+    if (!menu || menu.open) return;
+
+    if (previousOverflow.current === null) {
+      previousOverflow.current = document.body.style.overflow;
+    }
+    menu.showModal();
+    document.body.style.overflow = 'hidden';
+  };
 
   return (
     <>
@@ -27,7 +55,7 @@ export const MobileMenu = () => {
           type='button'
           aria-label='Открыть меню'
           aria-controls='mobile-menu'
-          popoverTarget='mobile-menu'
+          onClick={openMenu}
           className='flex size-11 items-center justify-center rounded-lg border border-border-inverse outline-offset-2 focus-visible:outline-2 focus-visible:outline-white'
         >
           <svg
@@ -44,19 +72,19 @@ export const MobileMenu = () => {
         </button>
       </div>
 
-      <div
+      <dialog
         ref={menuRef}
         id='mobile-menu'
-        popover='auto'
-        className='fixed inset-0 m-0 hidden h-dvh max-h-none w-screen max-w-none flex-col overflow-y-auto overscroll-contain border-0 bg-ink px-5 text-white [&:popover-open]:flex'
+        aria-label='Меню'
+        className='fixed inset-0 m-0 hidden h-dvh max-h-none w-screen max-w-none flex-col overflow-y-auto overscroll-contain border-0 bg-ink px-5 py-0 text-white [&[open]]:flex'
       >
         <div className='flex min-h-16 shrink-0 items-center justify-between border-b border-border-inverse'>
           <span className='text-lg font-bold'>Runforge</span>
           <button
             type='button'
             aria-label='Закрыть меню'
-            popoverTarget='mobile-menu'
-            popoverTargetAction='hide'
+            autoFocus
+            onClick={() => menuRef.current?.close()}
             className='flex size-11 items-center justify-center rounded-lg border border-border-inverse text-2xl outline-offset-2 focus-visible:outline-2 focus-visible:outline-white'
           >
             ×
@@ -72,7 +100,7 @@ export const MobileMenu = () => {
             Settings
           </span>
         </div>
-      </div>
+      </dialog>
     </>
   );
 };
